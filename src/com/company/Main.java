@@ -12,16 +12,8 @@ import java.util.ArrayList;
 
 public class Main {
 
-    // URLs are the exact url publicly available when one makes the classes respective google search
-
-    private static String [] urlsToVisit = {
-            // Class 0 - Windows Desktop
-            "https://www.google.ca/search?q=desktop&safe=off&hl=en&authuser=0&biw=1129&bih=749&site=imghp&tbs=isz:ex,iszw:1024,iszh:768&tbm=isch&source=lnt",
-            // Class 1 - Macintosh Desktop
-            "https://www.google.ca/search?q=desktop&safe=off&hl=en&authuser=0&biw=1129&bih=749&site=imghp&tbs=isz:ex,iszw:1024,iszh:768&tbm=isch&source=lnt#safe=off&hl=en&authuser=0&tbs=isz:ex%2Ciszw:1024%2Ciszh:768&tbm=isch&q=mac+desktop",
-            // Class 2 - Ubuntu (Linux) Desktop
-            "https://www.google.ca/search?q=desktop&safe=off&hl=en&authuser=0&biw=1129&bih=749&site=imghp&tbs=isz:ex,iszw:1024,iszh:768&tbm=isch&source=lnt#safe=off&hl=en&authuser=0&tbs=isz:ex%2Ciszw:1024%2Ciszh:768&tbm=isch&q=ubuntu+desktop"
-    };
+    // URL to visit, as defined by the first argument
+    private static String url;
 
     // Exact Image Width and Image Height required for the image to be a candidate test data point
     private static String imageWidth;
@@ -31,13 +23,13 @@ public class Main {
         System.out.println("A web scraper built using the jaunt api");
 
         // Criteria for validating image dimensions
-        if (args.length > 0) {
-            imageHeight = args[0];
-            imageWidth = args[1];
-        } else {
-            imageHeight = "768";
-            imageWidth = "1024";
-        }
+        if (args.length > 0)
+            url = args[0];
+        else
+            return;
+
+        imageHeight = "768";
+        imageWidth = "1024";
 
         // Set up UserAgent to visit sites
         UserAgent userAgent = new UserAgent();
@@ -45,19 +37,13 @@ public class Main {
     }
 
     private static void visitSites(UserAgent userAgent) {
-        int classNumber = 0;
-        // Visit each site and scrape images that meet the required dimensions
-        for (String url: urlsToVisit
-             ) {
-            try {
-                userAgent.visit(url);
-                ArrayList<URL> urls = scrapeImages(userAgent.doc.findEach("<img>"));
-                writeImagesToFile(urls, classNumber);
-                classNumber++;
-            } catch (JauntException e) {
-                System.err.println(e);
-            }
 
+        try {
+            userAgent.visit(url);
+            ArrayList<URL> urls = scrapeImages(userAgent.doc.findEach("<img>"));
+            writeImagesToFile(urls);
+        } catch (JauntException e) {
+            System.err.println(e);
         }
     }
 
@@ -91,7 +77,7 @@ public class Main {
         return urls;
         }
 
-    private static void writeImagesToFile(ArrayList<URL> urls, int classNumber) {
+    private static void writeImagesToFile(ArrayList<URL> urls) {
         BufferedImage image;
         int i = 0;
         try {
@@ -99,7 +85,7 @@ public class Main {
                     ) {
                 image = ImageIO.read(url);
 
-                ImageIO.write(image, "jpg", new File("images/class-" + classNumber + "-scraped-image-" + String.valueOf(i) + ".jpg"));
+                ImageIO.write(image, "jpg", new File("images/" + "scraped-image-" + String.valueOf(i) + ".jpg"));
                 i++;
             }
         } catch (IOException ioException) {
