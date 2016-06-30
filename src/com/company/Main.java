@@ -33,10 +33,16 @@ public class Main {
 
         // Set up UserAgent to visit sites
         UserAgent userAgent = new UserAgent();
-        visitSites(userAgent);
+        visitSite(userAgent);
     }
 
-    private static void visitSites(UserAgent userAgent) {
+    /**
+     *
+     * Visits site and writes images to file
+     *
+     * @param userAgent : Jaunt UserAgent that acts as client visiting site
+     */
+    private static void visitSite(UserAgent userAgent) {
 
         try {
             userAgent.visit(url);
@@ -47,6 +53,13 @@ public class Main {
         }
     }
 
+    /**
+     *
+     * Finds all images on a web page that meet dimensional criteria
+     *
+     * @param imageElements : all html image tags that exist on a webpage
+     * @return : ArrayList of acceptable image src urls
+     */
     private static ArrayList<URL> scrapeImages(Elements imageElements) {
 
         ArrayList<URL> urls = new ArrayList<URL>();
@@ -58,7 +71,7 @@ public class Main {
                             (!image.hasAttribute("height") || !image.hasAttribute("width"))
                                     || (image.getAt("height").equals(imageHeight) || image.getAt("width").equals(imageWidth))) {
 
-                        System.out.println("Image was not an acceptable data point.");
+                        System.out.println("Image was not an acceptable data point and was rejected because it did not meet dimension criteria.");
                     } else {
 
                         url =  new URL(image.getAt("src"));
@@ -77,6 +90,12 @@ public class Main {
         return urls;
         }
 
+    /**
+     *
+     * Writes image sources from webpage to file in jpg
+     *
+     * @param urls : image src links that will be written to file and saved
+     */
     private static void writeImagesToFile(ArrayList<URL> urls) {
         BufferedImage image;
         int i = 0;
